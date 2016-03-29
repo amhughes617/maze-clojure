@@ -1,7 +1,7 @@
 (ns maze-clojure.core
   (:gen-class))
 
-(def size 50)
+(def size 74)
 
 (defn create-rooms []
   (vec
