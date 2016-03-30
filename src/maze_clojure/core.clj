@@ -1,14 +1,14 @@
 (ns maze-clojure.core
   (:gen-class))
 
-(def size 74)
+(def size 10)
 
 (defn create-rooms []
   (vec
     (for [row (range size)]
       (vec
         (for [col (range size)]
-          {:row row :col col :visited? false :bottom? true :right? true})))))
+          {:row row :col col :visited? false :bottom? true :right? true :end? false :beginning? false})))))
  
 (defn possible-neighbors [rooms row col]
   (vec
@@ -48,13 +48,21 @@
       (loop [old-rooms (tear-down-wall rooms row col (:row next-room) (:col next-room))]
         (let [new-rooms (create-maze old-rooms (:row next-room) (:col next-room))]
           (if (= old-rooms new-rooms)
-            old-rooms
-            (recur new-rooms))))
-      rooms)))   
+             old-rooms
+           (recur new-rooms))))
+      (if (= rooms (remove (fn [room] 
+                              (:end? room)
+                             (flatten rooms))))
+         (let [rooms (assoc-in rooms [row col :end?] true)]
+            rooms)
+        rooms))))
+          
 
 (defn -main []
-  (let [rooms (create-rooms)
-        rooms (create-maze rooms 0 0)]
+  (let [rooms (create-rooms) 
+        rooms (create-maze rooms 0 0)
+        rooms (assoc-in rooms [0 0 :beginning?] true)]
+        
     ;print top walls
     (doseq [_ rooms]
       (print " _"))
@@ -63,9 +71,14 @@
     (doseq [row rooms]
       (print "|")
       (doseq [room row]
-        (if (:bottom? room)
-          (print "_")
-          (print " "))
+        (cond (:beginning? room)
+              (print "o")
+              (:end? room)
+              (print "x")
+              (:bottom? room)
+              (print "_")
+              :else
+              (print " "))
         (if (:right? room)
           (print "|")
           (print " ")))
