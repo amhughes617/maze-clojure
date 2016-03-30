@@ -50,9 +50,7 @@
           (if (= old-rooms new-rooms)
              old-rooms
            (recur new-rooms))))
-      (if (= rooms (remove (fn [room] 
-                              (:end? room)
-                             (flatten rooms))))
+      (if (= 0 (count (filter :end? (flatten rooms))))
          (let [rooms (assoc-in rooms [row col :end?] true)]
             rooms)
         rooms))))
